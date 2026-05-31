@@ -58,6 +58,20 @@ public class Formulaire {
     }
 
     /**
+     * @brief PREMIER CONSTRUCTEUR (À 4 paramètres)
+     * Appelé dans MenuPrincipal au tout début de la saisie,
+     * quand les listes d'étudiants et de fraudes sont encore vides.
+     */
+    public Formulaire(int identifiant, LocalDateTime dateDeCreation, LocalDateTime dateDeModification, Epreuve epreuve) {
+        this.identifiant = identifiant;
+        this.dateDeCreation = dateDeCreation;
+        this.dateDeModification = dateDeModification;
+        this.epreuve = epreuve;
+        this.etudiants = new ArrayList<>(); // Initialisation automatique à vide
+        this.fraudes = new ArrayList<>();   // Initialisation automatique à vide
+    }
+
+    /**
      * @brief Ajoute un étudiant à la liste du formulaire si celui-ci n'y est pas déjà.
      * @param e L'étudiant à ajouter.
      */
@@ -158,13 +172,37 @@ public class Formulaire {
 
     @Override
     public String toString() {
-        return "Formulaire{" +
-                "identifiant=" + identifiant +
-                ", dateDeCreation=" + dateDeCreation +
-                ", dateDeModification=" + dateDeModification +
-                ", epreuve=" + (epreuve != null ? epreuve.toString() : "aucune") +
-                ", nombreEtudiants=" + etudiants.size() +
-                ", nombreFraudes=" + fraudes.size() +
-                '}';
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n=======================================================\n");
+        sb.append(" DOSSIER DE FRAUDE N° ").append(identifiant).append("\n");
+        sb.append("=======================================================\n");
+        sb.append("• Créé le         : ").append(dateDeCreation).append("\n");
+        sb.append("• Modifié le      : ").append(dateDeModification).append("\n");
+        sb.append("• Épreuve         : ").append(epreuve != null ? epreuve.toString() : "Aucune").append("\n");
+
+        // 1. Boucle d'affichage pour les étudiants impliqués
+        sb.append("• Étudiant(s) impliqué(s) :\n");
+        if (etudiants == null || etudiants.isEmpty()) {
+            sb.append("  - Aucun étudiant enregistré\n");
+        } else {
+            for (Etudiant e : etudiants) {
+                sb.append("  - ").append(e.getPrenom()).append(" ").append(e.getNom())
+                        .append(" (N°").append(e.getNumeroApprenant()).append(" - Cursus: ").append(e.getCursus()).append(")\n");
+            }
+        }
+
+        // 2. Boucle d'affichage pour les types de fraudes (Polymorphisme en action)
+        sb.append("• Détail des fraudes constatées :\n");
+        if (fraudes == null || fraudes.isEmpty()) {
+            sb.append("  - Aucune fraude enregistrée\n");
+        } else {
+            for (Fraude f : fraudes) {
+                // Ici, f.toString() va appeler de manière transparente le toString()
+                // de FraudeIA, FraudePapier, etc., selon l'objet réel.
+                sb.append("  -> ").append(f.toString()).append("\n");
+            }
+        }
+        sb.append("=======================================================");
+        return sb.toString();
     }
 }

@@ -2,39 +2,31 @@ package fr.eseo.projetjava2025.interfaceUt;
 
 /**
  * @file AffichageConsole.java
- * @brief Fichier contenant la classe AffichageConsole.
+ * @brief Classe centralisant l'envoi de messages d'information, de succès ou d'erreur sur la console.
  */
-
-/**
- * @class AffichageConsole
- * @brief Classe gérant l'affichage des messages dans le terminal.
- *
- * Cette classe fournit des méthodes pour afficher différents types
- * de messages à l'utilisateur : erreurs, succès et messages simples.
- */
-public class AffichageConsole {
+public class AffichageConsole { // [cite: 145]
 
     /**
-     * @brief Affiche un message d'erreur formaté.
-     * @param message Le message d'erreur à afficher.
+     * @brief Affiche un message d'erreur sur le canal d'erreur standard.
+     * @param message Contenu textuel de l'erreur.
      */
-    public void afficherErreur(String message) {
-        System.out.println("[ERREUR] " + message);
+    public void afficherErreur(String message) { // [cite: 150]
+        System.err.println("[ERREUR] " + message);
     }
 
     /**
-     * @brief Affiche un message de succès formaté.
-     * @param message Le message de succès à afficher.
+     * @brief Affiche une notification de confirmation d'opération réussie.
+     * @param message Message de succès.
      */
-    public void afficherSucces(String message) {
+    public void afficherSucces(String message) { // [cite: 150]
         System.out.println("[SUCCÈS] " + message);
     }
 
     /**
-     * @brief Affiche un message simple.
-     * @param message Le message à afficher.
+     * @brief Affiche un message standard ou informatif brut.
+     * @param message Message informatif.
      */
-    public void afficherMessage(String message) {
+    public void afficherMessage(String message) { // [cite: 150]
         System.out.println(message);
     }
 }

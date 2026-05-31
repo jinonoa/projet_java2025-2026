@@ -38,9 +38,9 @@ public class FraudeIA extends Fraude {
      * @brief Implémentation de la méthode permettant d'afficher les détails spécifiques de la fraude IA.
      * @return Une chaîne de caractères formatée contenant le nom de l'IA, la description et la date du relevé.
      */
+
     @Override
-    public String afficherDetails() {
-        return "FraudeIA [Service IA : " + nomServiceIA + "] - " + getDescription()
-                + " (relevée le " + getDateReleve() + ")";
+    public String toString() {
+        return "[Fraude IA] " + super.toString() + " | Service utilisé: " + nomServiceIA;
     }
 }

@@ -1,115 +1,238 @@
 package fr.eseo.projetjava2025.interfaceUt;
 
+import fr.eseo.projetjava2025.entites.epreuve.Epreuve;
+import fr.eseo.projetjava2025.entites.epreuve.Modalite;
+import fr.eseo.projetjava2025.entites.etudiant.Cursus;
+import fr.eseo.projetjava2025.entites.etudiant.Etudiant;
+import fr.eseo.projetjava2025.entites.formulaire.Formulaire;
+import fr.eseo.projetjava2025.entites.fraude.*;
 import fr.eseo.projetjava2025.graphe.GrapheEtudiants;
 import fr.eseo.projetjava2025.service.FormulaireService;
 import fr.eseo.projetjava2025.service.RechercheService;
 import fr.eseo.projetjava2025.service.StatistiquesService;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
 /**
  * @file MenuPrincipal.java
- * @brief Fichier contenant la classe MenuPrincipal.
+ * @brief Classe principale de pilotage de l'IHM textuelle de l'application de gestion des fraudes.
+ * @details Gère la boucle globale d'exécution, l'aiguillage des choix du gestionnaire et orchestre
+ * les intéractions entres les différents services conformément aux diagrammes de séquences.
  */
+public class MenuPrincipal { // [cite: 135]
 
-/**
- * @class MenuPrincipal
- * @brief Classe gérant le menu principal de l'application.
- *
- * Cette classe constitue le point central de l'interface utilisateur.
- * Elle orchestre les interactions entre l'utilisateur et les différents
- * services de l'application via le terminal.
- */
-public class MenuPrincipal {
+    /** @brief Composant d'acquisition clavier. */
+    private SaisieUtilisateur saisie = new SaisieUtilisateur();
+    /** @brief Composant de restitution visuelle console. */
+    private AffichageConsole affichage = new AffichageConsole();
 
-    /** @brief Service de gestion des formulaires. */
+    // Attributs d'injections des couches métiers et structures de données
     private FormulaireService formulaireService;
-
-    /** @brief Service de recherche. */
     private RechercheService rechercheService;
-
-    /** @brief Service de calcul des statistiques. */
     private StatistiquesService statistiquesService;
-
-    /** @brief Graphe des étudiants fraudeurs. */
     private GrapheEtudiants grapheEtudiants;
 
-    /** @brief Gestionnaire de saisie utilisateur. */
-    private SaisieUtilisateur saisie;
-
-    /** @brief Gestionnaire d'affichage console. */
-    private AffichageConsole affichage;
-
     /**
-     * @brief Constructeur par défaut.
-     * Initialise tous les services et composants de l'interface.
+     * @brief Constructeur par initialisation/injection de dépendances.
      */
-    public MenuPrincipal() {
-        this.saisie = new SaisieUtilisateur();
-        this.affichage = new AffichageConsole();
-        this.formulaireService = new FormulaireService();
-        this.rechercheService = new RechercheService(formulaireService);
-        this.statistiquesService = new StatistiquesService(formulaireService);
-        this.grapheEtudiants = new GrapheEtudiants();
+    public MenuPrincipal(FormulaireService fs, RechercheService rs, StatistiquesService ss, GrapheEtudiants ge) {
+        this.formulaireService = fs;
+        this.rechercheService = rs;
+        this.statistiquesService = ss;
+        this.grapheEtudiants = ge;
     }
 
     /**
-     * @brief Affiche le menu principal dans le terminal.
+     * @brief Permet à l'utilisateur de choisir et de saisir une fraude.
+     * @return Fraude L'instance de la fraude créée selon le type choisi.
      */
-    public void afficherMenu() {
-        affichage.afficherMessage("\n========== GESTION DES FRAUDES ==========");
-        affichage.afficherMessage("1. Ajouter un formulaire de fraude");
-        affichage.afficherMessage("2. Consulter les formulaires");
-        affichage.afficherMessage("3. Rechercher un étudiant");
-        affichage.afficherMessage("4. Afficher les statistiques");
-        affichage.afficherMessage("5. Afficher le graphe de plagiat");
-        affichage.afficherMessage("0. Quitter");
-        affichage.afficherMessage("=========================================");
-        affichage.afficherMessage("Votre choix : ");
-    }
+    private Fraude saisirFraude() {
+        affichage.afficherMessage("\nType de fraude :");
+        affichage.afficherMessage("1. Fraude IA");
+        affichage.afficherMessage("2. Fraude IA Connectée");
+        affichage.afficherMessage("3. Fraude Calculatrice");
+        affichage.afficherMessage("4. Fraude Papier");
+        int choix = saisie.lireInt();
 
-    /**
-     * @brief Lance la boucle principale de l'application.
-     * Continue jusqu'à ce que l'utilisateur choisisse de quitter.
-     */
-    public void lancerApplication() {
-        int choix = -1;
-        while (choix != 0) {
-            afficherMenu();
-            choix = saisie.lireInt();
-            gererChoix(choix);
-        }
-        affichage.afficherMessage("Au revoir !");
-    }
+        affichage.afficherMessage("Description : ");
+        String description = saisie.lireString();
+        affichage.afficherMessage("Contenu : ");
+        String contenu = saisie.lireString();
+        affichage.afficherMessage("Date de relevé (dd/MM/yyyy) : ");
+        LocalDate dateReleve = saisie.lireDate();
 
-    /**
-     * @brief Gère le choix de l'utilisateur et appelle le service correspondant.
-     * @param choix Le numéro de l'option choisie par l'utilisateur.
-     */
-    public void gererChoix(int choix) {
         switch (choix) {
             case 1:
-                affichage.afficherMessage("Fonctionnalité : Ajouter un formulaire (à implémenter)");
-                break;
+                affichage.afficherMessage("Nom du service IA : ");
+                String nomIA = saisie.lireString();
+                return new FraudeIA(dateReleve, description, contenu, nomIA);
             case 2:
-                affichage.afficherMessage("Fonctionnalité : Consulter les formulaires (à implémenter)");
-                break;
+                affichage.afficherMessage("Nom du service IA : ");
+                String nomIAC = saisie.lireString();
+                affichage.afficherMessage("Adresse IP : ");
+                String ip = saisie.lireString();
+                return new FraudeIAConnectee(dateReleve, description, contenu, nomIAC, ip);
             case 3:
-                affichage.afficherMessage("Fonctionnalité : Rechercher un étudiant (à implémenter)");
-                break;
+                affichage.afficherMessage("Marque de la calculatrice : ");
+                String marque = saisie.lireString();
+                affichage.afficherMessage("Programme stocké : ");
+                String programme = saisie.lireString();
+                return new FraudeCalculatrice(dateReleve, description, contenu, marque, programme);
             case 4:
-                affichage.afficherMessage("=== Statistiques ===");
-                affichage.afficherMessage("Total formulaires : " + statistiquesService.nombreTotalFormulaires());
-                affichage.afficherMessage("Total fraudes : " + statistiquesService.nombreTotalFraudes());
-                affichage.afficherMessage("Moyenne fraudes/formulaire : " + statistiquesService.moyenneFraudesParFormulaire());
-                affichage.afficherMessage("Écart-type : " + statistiquesService.ecartTypeFraudesParFormulaire());
-                break;
-            case 5:
-                grapheEtudiants.construireGraphe(formulaireService.getTousLesFormulaires());
-                affichage.afficherMessage(grapheEtudiants.afficherGraphe());
-                break;
-            case 0:
-                break;
+                affichage.afficherMessage("Dimensions du papier : ");
+                String dimensions = saisie.lireString();
+                affichage.afficherMessage("Plié ? (true/false) : ");
+                boolean plie = Boolean.parseBoolean(saisie.lireString());
+                return new FraudePapier(dateReleve, description, contenu, dimensions, plie);
             default:
-                affichage.afficherErreur("Choix invalide.");
+                affichage.afficherErreur("Type invalide, fraude papier créée par défaut.");
+                return new FraudePapier(dateReleve, description, contenu, "inconnue", false);
         }
+    }
+
+    /**
+     * @brief Affiche textuellement la liste des fonctionnalités disponibles.
+     */
+    public void afficherMenu() { // [cite: 136]
+        affichage.afficherMessage("\n================ GESTION DES CAS DE FRAUDE ================");
+        affichage.afficherMessage("1. Enregistrer un nouveau formulaire de fraude");
+        affichage.afficherMessage("2. Consulter l'intégralité des formulaires existants");
+        affichage.afficherMessage("3. Rechercher un étudiant par son numéro unique d'apprenant");
+        affichage.afficherMessage("4. Générer et afficher les statistiques globales");
+        affichage.afficherMessage("5. Générer et visualiser le graphe de plagiat");
+        affichage.afficherMessage("6. Quitter le programme");
+        affichage.afficherMessage("===========================================================");
+        System.out.print("Veuillez renseigner votre choix : ");
+    }
+
+    /**
+     * @brief Lance l'exécution continue de l'application.
+     */
+    public void lancerApplication() { // [cite: 136]
+        int choix = 0;
+        do {
+            afficherMenu();
+            choix = saisie.lireInt();
+            gererChoix(choix); // [cite: 136]
+        } while (choix != 6);
+    }
+
+    /**
+     * @brief Routeur interne appelant l'action métier associée à l'option saisie.
+     * @param choix Option numérique saisie par l'utilisateur.
+     */
+    private void gererChoix(int choix) { // [cite: 136]
+        switch (choix) {
+            case 1 -> ajouterNouveauFormulaire();
+            case 2 -> consulterFormulaires();
+            case 3 -> rechercherEtudiant();
+            case 4 -> afficherStatistiques();
+            case 5 -> afficherGraphePlagiat();
+            case 6 -> affichage.afficherMessage("Fermeture en cours... Merci d'avoir utilisé l'application.");
+            default -> affichage.afficherErreur("Option inconnue. Veuillez entrer un nombre entre 1 et 6.");
+        }
+    }
+
+    /**
+     * @brief Scénario d'ajout de formulaire traduit fidèlement depuis votre diagramme de séquence (Page 6).
+     * @note Utilise précisément les attributs : codeECUE, date, heure, duree, modalite pour l'Epreuve.
+     */
+    private void ajouterNouveauFormulaire() {
+        affichage.afficherMessage("\n--- SÉQUENCE D'ENREGISTREMENT D'UNE FRAUDE ---");
+
+        // Saisie des métadonnées de l'épreuve
+        System.out.print("Code ECUE de l'épreuve (Ex: M4102) : ");
+        String codeECUE = saisie.lireString(); // [cite: 53]
+        System.out.print("Date de l'épreuve (JJ/MM/AAAA) : ");
+        java.time.LocalDate date = saisie.lireDate(); // [cite: 55]
+        System.out.print("Durée de l'épreuve (en minutes) : ");
+        int duree = saisie.lireInt(); // [cite: 58]
+
+        // Affectation d'une modalité standard pour la console
+        Modalite modalite = Modalite.EXAMEN_ECRIT; // [cite: 65, 75]
+
+        // Instanciation de l'épreuve (les attributs correspondent exactement à la modélisation)
+        Epreuve epreuve = new Epreuve(codeECUE, date, null, duree, modalite); // [cite: 53, 55, 56, 58, 65]
+
+        // Attribution d'un identifiant numérique incrémental automatique pour le Formulaire
+        int identifiant = formulaireService.getTousLesFormulaires().size() + 1; // [cite: 40]
+
+        // Création du formulaire (dateDeCreation et dateDeModification fixées à l'instant t)
+        Formulaire formulaire = new Formulaire(identifiant, LocalDateTime.now(), LocalDateTime.now(), epreuve); // [cite: 40, 42]
+
+        // Boucle d'enregistrement des étudiants impliqués (Diagramme de Séquence, boucle 1)
+        String optionEtudiant;
+        do {
+            affichage.afficherMessage("\n-> Enregistrement d'un étudiant impliqué :");
+            System.out.print("Nom : ");
+            String nom = saisie.lireString(); //
+            System.out.print("Prénom : ");
+            String prenom = saisie.lireString(); //
+            System.out.print("Numéro d'apprenant (entier) : ");
+            int numeroApprenant = saisie.lireInt();
+            // Attribution par défaut d'un cursus fictif valide (E1 par exemple)
+            Etudiant etudiant = new Etudiant(prenom, nom, numeroApprenant, Cursus.E1); // [cite: 28, 29, 30, 31, 57]
+            formulaire.ajouteEtudiant(etudiant); // [cite: 44]
+
+            System.out.print("Y a-t-il un autre étudiant impliqué conjointement ? (o/n) : ");
+            optionEtudiant = saisie.lireString();
+        } while (optionEtudiant.equalsIgnoreCase("o"));
+
+        // Boucle d'enregistrement des pièces de fraude constatées (Diagramme de Séquence, boucle 2)
+        String optionFraude;
+        do {
+            // APPEL DE VOTRE MÉTHODE ICI :
+            Fraude fraude = saisirFraude();
+
+            // Ajout de l'objet créé (qu'il soit IA, Calculatrice ou Papier) au formulaire
+            formulaire.ajouteFraude(fraude);
+
+            System.out.print("Souhaitez-vous annexer un autre fait de fraude à ce dossier ? (o/n) : ");
+            optionFraude = saisie.lireString();
+        } while (optionFraude.equalsIgnoreCase("o"));
+
+        // Persistance finale au sein du service
+        formulaireService.ajouterFormulaire(formulaire); // [cite: 104, 187]
+        affichage.afficherSucces("Le dossier de fraude N°" + identifiant + " a été consigné avec succès !");
+    }
+
+    private void consulterFormulaires() {
+        List<Formulaire> formulaires = formulaireService.getTousLesFormulaires(); // [cite: 104, 105]
+        if (formulaires.isEmpty()) {
+            affichage.afficherMessage("Aucune donnée enregistrée dans l'application.");
+            return;
+        }
+        for (Formulaire f : formulaires) {
+            affichage.afficherMessage(f.toString()); // [cite: 50]
+        }
+    }
+
+    private void rechercherEtudiant() {
+        System.out.print("\nSaisissez le numéro d'apprenant à rechercher : ");
+        String numero = saisie.lireString();
+        Etudiant e = rechercheService.rechercherEtudiantsParNumero(numero); // [cite: 107]
+        if (e != null) {
+            affichage.afficherMessage("Résultat de recherche : " + e.getPrenom() + " " + e.getNom() + " (Cursus : " + e.getCursus() + ")"); // [cite: 28, 29, 31]
+        } else {
+            affichage.afficherErreur("Aucun étudiant ne correspond à ce numéro dans la base de données de fraude.");
+        }
+    }
+
+    private void afficherStatistiques() {
+        affichage.afficherMessage("\n--- ÉDITION DES METRIQUES ET STATISTIQUES ---");
+        // Les appels s'enchaînent de manière synchrone, à l'image du diagramme de séquence (Page 7)
+        affichage.afficherMessage("Nombre total de formulaires instanciés : " + statistiquesService.nombreTotalFormulaires()); // [cite: 109]
+        affichage.afficherMessage("Nombre global d'étudiants fraudeurs uniques : " + statistiquesService.nombreEtudiantsDistincts()); // [cite: 109]
+        affichage.afficherMessage("Nombre cumulé d'infractions (fraudes) : " + statistiquesService.nombreTotalFraudes()); // [cite: 110]
+        affichage.afficherMessage("Moyenne arithmétique de fraudes par formulaire : " + statistiquesService.moyenneFraudesParFormulaire()); // [cite: 111]
+        affichage.afficherMessage("Écart-type de la distribution des fraudes : " + statistiquesService.ecartTypeFraudesParFormulaire()); // [cite: 111]
+    }
+
+    private void afficherGraphePlagiat() {
+        // Exécution de la cinématique décrite en Page 8 : calcul, puis récupération textuelle
+        grapheEtudiants.construireGraphe(formulaireService.getTousLesFormulaires()); // [cite: 105, 119, 236]
+        affichage.afficherMessage("\n" + grapheEtudiants.afficherGraphe()); // [cite: 121, 240]
     }
 }

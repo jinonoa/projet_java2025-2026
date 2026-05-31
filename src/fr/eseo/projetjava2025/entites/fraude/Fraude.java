@@ -52,5 +52,12 @@ public abstract class Fraude {
      * Chaque classe fille doit implémenter cette méthode pour afficher ses propres attributs.
      * @return Une chaîne de caractères contenant le détail complet de la fraude.
      */
-    public abstract String afficherDetails();
+    @Override
+    public String toString() {
+        return "Date: " + dateReleve + " | Description: " + description + " | Preuves: " + contenu;
+    }
+    public void afficherDetails() {
+        System.out.println(this.toString());
+    }
+
 }

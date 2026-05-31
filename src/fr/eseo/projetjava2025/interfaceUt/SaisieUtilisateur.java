@@ -2,69 +2,52 @@ package fr.eseo.projetjava2025.interfaceUt;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 /**
  * @file SaisieUtilisateur.java
- * @brief Fichier contenant la classe SaisieUtilisateur.
+ * @brief Classe responsable de la capture sécurisée des données saisies par l'utilisateur.
  */
+public class SaisieUtilisateur { // [cite: 144]
 
-/**
- * @class SaisieUtilisateur
- * @brief Classe gérant la saisie des données utilisateur depuis le terminal.
- *
- * Cette classe fournit des méthodes pour lire différents types de données
- * saisies par l'utilisateur via le clavier, avec gestion des erreurs de saisie.
- */
-public class SaisieUtilisateur {
-
-    /** @brief Scanner utilisé pour lire les entrées clavier. */
-    private Scanner scanner;
+    /** @brief Scanner lié au flux d'entrée standard (clavier). */
+    private Scanner scanner = new Scanner(System.in);
 
     /**
-     * @brief Constructeur par défaut.
-     * Initialise le scanner sur l'entrée standard.
+     * @brief Lit un entier valide depuis le terminal.
+     * @return int L'entier saisi.
      */
-    public SaisieUtilisateur() {
-        this.scanner = new Scanner(System.in);
-    }
-
-    /**
-     * @brief Lit un entier saisi par l'utilisateur.
-     * Redemande tant que la saisie n'est pas un entier valide.
-     * @return int La valeur entière saisie.
-     */
-    public int lireInt() {
-        while (!scanner.hasNextInt()) {
-            System.out.println("Veuillez entrer un entier valide.");
-            scanner.next();
+    public int lireInt() { // [cite: 149]
+        while (true) {
+            try {
+                return Integer.parseInt(scanner.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.out.print("Saisie incorrecte. Veuillez entrer un entier : ");
+            }
         }
-        int valeur = scanner.nextInt();
-        scanner.nextLine();
-        return valeur;
     }
 
     /**
-     * @brief Lit une chaîne de caractères saisie par l'utilisateur.
-     * @return String La chaîne saisie sans espaces superflus.
+     * @brief Lit une chaîne de caractères depuis le terminal.
+     * @return String Le texte saisi sans espaces inutiles aux extrémités.
      */
-    public String lireString() {
+    public String lireString() { // [cite: 149]
         return scanner.nextLine().trim();
     }
 
     /**
-     * @brief Lit une date saisie par l'utilisateur au format dd/MM/yyyy.
-     * Redemande tant que le format n'est pas valide.
-     * @return LocalDate La date saisie.
+     * @brief Lit une date au format textuel français et la convertit en objet temporel Java.
+     * @return LocalDate La date correspondante.
      */
-    public LocalDate lireDate() {
+    public LocalDate lireDate() { // [cite: 149]
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         while (true) {
+            String saisie = scanner.nextLine().trim();
             try {
-                String input = scanner.nextLine().trim();
-                return LocalDate.parse(input, formatter);
-            } catch (Exception e) {
-                System.out.println("Format invalide. Entrez une date au format dd/MM/yyyy :");
+                return LocalDate.parse(saisie, formatter);
+            } catch (DateTimeParseException e) {
+                System.out.print("Format invalide (Saisissez sous la forme JJ/MM/AAAA) : ");
             }
         }
     }

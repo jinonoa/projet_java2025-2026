@@ -42,9 +42,7 @@ public class FraudeIAConnectee extends FraudeIA {
      * @return Une chaîne de caractères formatée contenant l'ensemble des détails.
      */
     @Override
-    public String afficherDetails() {
-        return "FraudeIAConnectee [Service IA : " + getNomServiceIA()
-                + ", IP : " + adresseIP + "] - " + getDescription()
-                + " (relevée le " + getDateReleve() + ")";
+    public String toString() {
+        return "[Fraude IA Connectée] " + super.toString() + " | Adresse IP: " + adresseIP;
     }
 }

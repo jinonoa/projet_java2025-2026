@@ -49,9 +49,7 @@ public class FraudePapier extends Fraude {
      * @return Une chaîne de caractères formatée contenant les dimensions, l'état de pliage, la description et la date.
      */
     @Override
-    public String afficherDetails() {
-        return "FraudePapier [Dimensions : " + dimensions
-                + ", Plié : " + (plie ? "oui" : "non") + "] - " + getDescription()
-                + " (relevée le " + getDateReleve() + ")";
+    public String toString() {
+        return "[Fraude Papier] " + super.toString() + " | Dimensions: " + dimensions + " | Plié: " + (plie ? "Oui" : "Non");
     }
 }

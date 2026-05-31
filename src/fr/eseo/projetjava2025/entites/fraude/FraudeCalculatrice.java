@@ -49,9 +49,7 @@ public class FraudeCalculatrice extends Fraude {
      * @return Une chaîne de caractères formatée contenant la marque, le programme, la description et la date du relevé.
      */
     @Override
-    public String afficherDetails() {
-        return "FraudeCalculatrice [Marque : " + marque
-                + ", Programme : " + programmeStocke + "] - " + getDescription()
-                + " (relevée le " + getDateReleve() + ")";
+    public String toString() {
+        return "[Fraude Calculatrice] " + super.toString() + " | Marque: " + marque + " | Programme: " + programmeStocke;
     }
 }
