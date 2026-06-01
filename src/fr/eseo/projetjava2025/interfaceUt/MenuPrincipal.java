@@ -21,7 +21,7 @@ import java.util.List;
  * @details Gère la boucle globale d'exécution, l'aiguillage des choix du gestionnaire et orchestre
  * les intéractions entres les différents services conformément aux diagrammes de séquences.
  */
-public class MenuPrincipal { // [cite: 135]
+public class MenuPrincipal {
 
     /** @brief Composant d'acquisition clavier. */
     private SaisieUtilisateur saisie = new SaisieUtilisateur();
@@ -83,8 +83,8 @@ public class MenuPrincipal { // [cite: 135]
             case 4:
                 affichage.afficherMessage("Dimensions du papier : ");
                 String dimensions = saisie.lireString();
-                affichage.afficherMessage("Plié ? (true/false) : ");
-                boolean plie = Boolean.parseBoolean(saisie.lireString());
+                affichage.afficherMessage("Plié ? (o/n) : ");
+                boolean plie = saisie.lireString().equalsIgnoreCase("o");
                 return new FraudePapier(dateReleve, description, contenu, dimensions, plie);
             default:
                 affichage.afficherErreur("Type invalide, fraude papier créée par défaut.");
@@ -95,14 +95,15 @@ public class MenuPrincipal { // [cite: 135]
     /**
      * @brief Affiche textuellement la liste des fonctionnalités disponibles.
      */
-    public void afficherMenu() { // [cite: 136]
+    public void afficherMenu() {
         affichage.afficherMessage("\n================ GESTION DES CAS DE FRAUDE ================");
         affichage.afficherMessage("1. Enregistrer un nouveau formulaire de fraude");
         affichage.afficherMessage("2. Consulter l'intégralité des formulaires existants");
-        affichage.afficherMessage("3. Rechercher un étudiant par son numéro unique d'apprenant");
-        affichage.afficherMessage("4. Générer et afficher les statistiques globales");
-        affichage.afficherMessage("5. Générer et visualiser le graphe de plagiat");
-        affichage.afficherMessage("6. Quitter le programme");
+        affichage.afficherMessage("3. Supprimer (retirer) un formulaire par son identifiant");
+        affichage.afficherMessage("4. Rechercher un étudiant par son numéro unique d'apprenant");
+        affichage.afficherMessage("5. Générer et afficher les statistiques globales");
+        affichage.afficherMessage("6. Générer et visualiser le graphe de plagiat");
+        affichage.afficherMessage("7. Quitter le programme");
         affichage.afficherMessage("===========================================================");
         System.out.print("Veuillez renseigner votre choix : ");
     }
@@ -110,28 +111,29 @@ public class MenuPrincipal { // [cite: 135]
     /**
      * @brief Lance l'exécution continue de l'application.
      */
-    public void lancerApplication() { // [cite: 136]
+    public void lancerApplication() {
         int choix = 0;
         do {
             afficherMenu();
             choix = saisie.lireInt();
-            gererChoix(choix); // [cite: 136]
-        } while (choix != 6);
+            gererChoix(choix);
+        } while (choix != 7);
     }
 
     /**
      * @brief Routeur interne appelant l'action métier associée à l'option saisie.
      * @param choix Option numérique saisie par l'utilisateur.
      */
-    private void gererChoix(int choix) { // [cite: 136]
+    private void gererChoix(int choix) {
         switch (choix) {
             case 1 -> ajouterNouveauFormulaire();
             case 2 -> consulterFormulaires();
-            case 3 -> rechercherEtudiant();
-            case 4 -> afficherStatistiques();
-            case 5 -> afficherGraphePlagiat();
-            case 6 -> affichage.afficherMessage("Fermeture en cours... Merci d'avoir utilisé l'application.");
-            default -> affichage.afficherErreur("Option inconnue. Veuillez entrer un nombre entre 1 et 6.");
+            case 3 -> retirerFormulaire();
+            case 4 -> rechercherEtudiant();
+            case 5 -> afficherStatistiques();
+            case 6 -> afficherGraphePlagiat();
+            case 7 -> affichage.afficherMessage("Fermeture en cours... Merci d'avoir utilisé l'application.");
+            default -> affichage.afficherErreur("Option inconnue. Veuillez entrer un nombre entre 1 et 7.");
         }
     }
 
@@ -144,18 +146,18 @@ public class MenuPrincipal { // [cite: 135]
 
         // Saisie des métadonnées de l'épreuve
         System.out.print("Code ECUE de l'épreuve (Ex: M4102) : ");
-        String codeECUE = saisie.lireString(); // [cite: 53]
+        String codeECUE = saisie.lireString();
         System.out.print("Date de l'épreuve (JJ/MM/AAAA) : ");
-        java.time.LocalDate date = saisie.lireDate(); // [cite: 55]
+        java.time.LocalDate date = saisie.lireDate();
         System.out.print("Durée de l'épreuve (en minutes) : ");
-        int duree = saisie.lireInt(); // [cite: 58]
+        int duree = saisie.lireInt();
 
         // Affectation d'une modalité standard pour la console
         Modalite modaliteChoisie = choisirModalite();
         Epreuve epreuve = new Epreuve(codeECUE, date, null, duree, modaliteChoisie);
 
         // Attribution d'un identifiant numérique incrémental automatique pour le Formulaire
-        int identifiant = formulaireService.getTousLesFormulaires().size() + 1; // [cite: 40]
+        int identifiant = formulaireService.getTousLesFormulaires().size() + 1;
 
         // Création du formulaire (dateDeCreation et dateDeModification fixées à l'instant t)
         Formulaire formulaire = new Formulaire(identifiant, LocalDateTime.now(), LocalDateTime.now(), epreuve);
@@ -166,15 +168,15 @@ public class MenuPrincipal { // [cite: 135]
         do {
             affichage.afficherMessage("\n-> Enregistrement d'un étudiant impliqué :");
             System.out.print("Nom : ");
-            String nom = saisie.lireString(); //
+            String nom = saisie.lireString();
             System.out.print("Prénom : ");
-            String prenom = saisie.lireString(); //
+            String prenom = saisie.lireString();
             System.out.print("Numéro d'apprenant (entier) : ");
             int numeroApprenant = saisie.lireInt();
 
             Cursus cursusChoisi = choisirCursus();
             Etudiant etudiant = new Etudiant(prenom, nom, numeroApprenant, cursusChoisi);
-            formulaire.ajouteEtudiant(etudiant); // [cite: 44]
+            formulaire.ajouteEtudiant(etudiant);
 
             System.out.print("Y a-t-il un autre étudiant impliqué conjointement ? (o/n) : ");
             optionEtudiant = saisie.lireString();
@@ -198,6 +200,25 @@ public class MenuPrincipal { // [cite: 135]
         affichage.afficherSucces("Le dossier de fraude N°" + identifiant + " a été consigné avec succès !");
     }
 
+
+    /**
+     * @brief Scénario interactif de retrait de dossier (Exigence du Cahier des charges).
+     */
+    private void retirerFormulaire() {
+        affichage.afficherMessage("\n--- RETRAIT D'UN DOSSIER DE FRAUDE ---");
+        System.out.print("Entrez l'identifiant du formulaire à supprimer : ");
+        int id = saisie.lireInt();
+
+        // Appel de la méthode de suppression créée à l'étape 1
+        boolean succes = formulaireService.supprimerFormulaire(id);
+
+        if (succes) {
+            affichage.afficherSucces("Le formulaire N°" + id + " a bien été retiré du système.");
+        } else {
+            affichage.afficherErreur("L'identifiant " + id + " est inconnu. Aucun retrait effectué.");
+        }
+    }
+
     private Cursus choisirCursus() {
         affichage.afficherMessage("Sélectionnez le cursus de l'étudiant :");
         Cursus[] lesCursus = Cursus.values();
@@ -210,7 +231,7 @@ public class MenuPrincipal { // [cite: 135]
         System.out.print("Votre choix : ");
         int choix = saisie.lireInt();
 
-        // Sécurité au cas où l'utilisateur saisit un nombre en dehors des options
+        // Securité au cas où l'utilisateur saisit un nombre en dehors des options
         while (choix < 1 || choix > lesCursus.length) {
             System.out.print("Choix invalide. Veuillez entrer un nombre entre 1 et " + lesCursus.length + " : ");
             choix = saisie.lireInt();
@@ -240,22 +261,22 @@ public class MenuPrincipal { // [cite: 135]
     }
 
     private void consulterFormulaires() {
-        List<Formulaire> formulaires = formulaireService.getTousLesFormulaires(); //
+        List<Formulaire> formulaires = formulaireService.getTousLesFormulaires();
         if (formulaires.isEmpty()) {
             affichage.afficherMessage("Aucune donnée enregistrée dans l'application.");
             return;
         }
         for (Formulaire f : formulaires) {
-            affichage.afficherMessage(f.toString()); //
+            affichage.afficherMessage(f.toString());
         }
     }
 
     private void rechercherEtudiant() {
         System.out.print("\nSaisissez le numéro d'apprenant à rechercher : ");
         String numero = saisie.lireString();
-        Etudiant e = rechercheService.rechercherEtudiantsParNumero(numero); //
+        Etudiant e = rechercheService.rechercherEtudiantsParNumero(numero);
         if (e != null) {
-            affichage.afficherMessage("Résultat de recherche : " + e.getPrenom() + " " + e.getNom() + " (Cursus : " + e.getCursus() + ")"); // [cite: 28, 29, 31]
+            affichage.afficherMessage("Résultat de recherche : " + e.getPrenom() + " " + e.getNom() + " (Cursus : " + e.getCursus() + ")");
         } else {
             affichage.afficherErreur("Aucun étudiant ne correspond à ce numéro dans la base de données de fraude.");
         }
@@ -264,16 +285,16 @@ public class MenuPrincipal { // [cite: 135]
     private void afficherStatistiques() {
         affichage.afficherMessage("\n--- ÉDITION DES METRIQUES ET STATISTIQUES ---");
         // Les appels s'enchaînent de manière synchrone, à l'image du diagramme de séquence (Page 7)
-        affichage.afficherMessage("Nombre total de formulaires instanciés : " + statistiquesService.nombreTotalFormulaires()); // [cite: 109]
-        affichage.afficherMessage("Nombre global d'étudiants fraudeurs uniques : " + statistiquesService.nombreEtudiantsDistincts()); // [cite: 109]
-        affichage.afficherMessage("Nombre cumulé d'infractions (fraudes) : " + statistiquesService.nombreTotalFraudes()); // [cite: 110]
-        affichage.afficherMessage("Moyenne arithmétique de fraudes par formulaire : " + statistiquesService.moyenneFraudesParFormulaire()); // [cite: 111]
-        affichage.afficherMessage("Écart-type de la distribution des fraudes : " + statistiquesService.ecartTypeFraudesParFormulaire()); // [cite: 111]
+        affichage.afficherMessage("Nombre total de formulaires instanciés : " + statistiquesService.nombreTotalFormulaires());
+        affichage.afficherMessage("Nombre global d'étudiants fraudeurs uniques : " + statistiquesService.nombreEtudiantsDistincts());
+        affichage.afficherMessage("Nombre cumulé d'infractions (fraudes) : " + statistiquesService.nombreTotalFraudes());
+        affichage.afficherMessage("Moyenne arithmétique de fraudes par formulaire : " + statistiquesService.moyenneFraudesParFormulaire());
+        affichage.afficherMessage("Écart-type de la distribution des fraudes : " + statistiquesService.ecartTypeFraudesParFormulaire());
     }
 
     private void afficherGraphePlagiat() {
         // Exécution de la cinématique décrite en Page 8 : calcul, puis récupération textuelle
-        grapheEtudiants.construireGraphe(formulaireService.getTousLesFormulaires()); // [cite: 105, 119, 236]
-        affichage.afficherMessage("\n" + grapheEtudiants.afficherGraphe()); // [cite: 121, 240]
+        grapheEtudiants.construireGraphe(formulaireService.getTousLesFormulaires());
+        affichage.afficherMessage("\n" + grapheEtudiants.afficherGraphe());
     }
 }
