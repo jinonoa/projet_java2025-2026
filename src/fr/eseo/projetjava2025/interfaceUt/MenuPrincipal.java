@@ -151,16 +151,15 @@ public class MenuPrincipal { // [cite: 135]
         int duree = saisie.lireInt(); // [cite: 58]
 
         // Affectation d'une modalité standard pour la console
-        Modalite modalite = Modalite.EXAMEN_ECRIT; // [cite: 65, 75]
-
-        // Instanciation de l'épreuve (les attributs correspondent exactement à la modélisation)
-        Epreuve epreuve = new Epreuve(codeECUE, date, null, duree, modalite); // [cite: 53, 55, 56, 58, 65]
+        Modalite modaliteChoisie = choisirModalite();
+        Epreuve epreuve = new Epreuve(codeECUE, date, null, duree, modaliteChoisie);
 
         // Attribution d'un identifiant numérique incrémental automatique pour le Formulaire
         int identifiant = formulaireService.getTousLesFormulaires().size() + 1; // [cite: 40]
 
         // Création du formulaire (dateDeCreation et dateDeModification fixées à l'instant t)
-        Formulaire formulaire = new Formulaire(identifiant, LocalDateTime.now(), LocalDateTime.now(), epreuve); // [cite: 40, 42]
+        Formulaire formulaire = new Formulaire(identifiant, LocalDateTime.now(), LocalDateTime.now(), epreuve);
+
 
         // Boucle d'enregistrement des étudiants impliqués (Diagramme de Séquence, boucle 1)
         String optionEtudiant;
@@ -172,8 +171,9 @@ public class MenuPrincipal { // [cite: 135]
             String prenom = saisie.lireString(); //
             System.out.print("Numéro d'apprenant (entier) : ");
             int numeroApprenant = saisie.lireInt();
-            // Attribution par défaut d'un cursus fictif valide (E1 par exemple)
-            Etudiant etudiant = new Etudiant(prenom, nom, numeroApprenant, Cursus.E1); // [cite: 28, 29, 30, 31, 57]
+
+            Cursus cursusChoisi = choisirCursus();
+            Etudiant etudiant = new Etudiant(prenom, nom, numeroApprenant, cursusChoisi);
             formulaire.ajouteEtudiant(etudiant); // [cite: 44]
 
             System.out.print("Y a-t-il un autre étudiant impliqué conjointement ? (o/n) : ");
@@ -194,25 +194,66 @@ public class MenuPrincipal { // [cite: 135]
         } while (optionFraude.equalsIgnoreCase("o"));
 
         // Persistance finale au sein du service
-        formulaireService.ajouterFormulaire(formulaire); // [cite: 104, 187]
+        formulaireService.ajouterFormulaire(formulaire);
         affichage.afficherSucces("Le dossier de fraude N°" + identifiant + " a été consigné avec succès !");
     }
 
+    private Cursus choisirCursus() {
+        affichage.afficherMessage("Sélectionnez le cursus de l'étudiant :");
+        Cursus[] lesCursus = Cursus.values();
+
+        // On affiche dynamiquement toutes les options de l'Enum
+        for (int i = 0; i < lesCursus.length; i++) {
+            affichage.afficherMessage((i + 1) + ". " + lesCursus[i].name());
+        }
+
+        System.out.print("Votre choix : ");
+        int choix = saisie.lireInt();
+
+        // Sécurité au cas où l'utilisateur saisit un nombre en dehors des options
+        while (choix < 1 || choix > lesCursus.length) {
+            System.out.print("Choix invalide. Veuillez entrer un nombre entre 1 et " + lesCursus.length + " : ");
+            choix = saisie.lireInt();
+        }
+
+        // On retourne le cursus correspondant (index - 1 car les tableaux commencent à 0)
+        return lesCursus[choix - 1];
+    }
+
+    private Modalite choisirModalite() {
+        affichage.afficherMessage("Sélectionnez la modalité de l'épreuve :");
+        Modalite[] lesModalites = Modalite.values();
+
+        for (int i = 0; i < lesModalites.length; i++) {
+            affichage.afficherMessage((i + 1) + ". " + lesModalites[i].name());
+        }
+
+        System.out.print("Votre choix : ");
+        int choix = saisie.lireInt();
+
+        while (choix < 1 || choix > lesModalites.length) {
+            System.out.print("Choix invalide. Veuillez entrer un nombre entre 1 et " + lesModalites.length + " : ");
+            choix = saisie.lireInt();
+        }
+
+        return lesModalites[choix - 1];
+    }
+
     private void consulterFormulaires() {
-        List<Formulaire> formulaires = formulaireService.getTousLesFormulaires(); // [cite: 104, 105]
+        List<Formulaire> formulaires = formulaireService.getTousLesFormulaires(); //
         if (formulaires.isEmpty()) {
             affichage.afficherMessage("Aucune donnée enregistrée dans l'application.");
             return;
         }
         for (Formulaire f : formulaires) {
-            affichage.afficherMessage(f.toString()); // [cite: 50]
+            affichage.afficherMessage(f.toString()); //
         }
     }
 
     private void rechercherEtudiant() {
         System.out.print("\nSaisissez le numéro d'apprenant à rechercher : ");
         String numero = saisie.lireString();
-        Etudiant e = rechercheService.rechercherEtudiantsParNumero(numero); // [cite: 107]
+        Etudiant e = rechercheService.rechercherEtudiantsParNumero(numero); //
         if (e != null) {
             affichage.afficherMessage("Résultat de recherche : " + e.getPrenom() + " " + e.getNom() + " (Cursus : " + e.getCursus() + ")"); // [cite: 28, 29, 31]
         } else {

@@ -31,6 +31,6 @@ public class Application { //
         MenuPrincipal menu = new MenuPrincipal(formulaireService, rechercheService, statistiquesService, grapheEtudiants);
 
         // 4. Lancement opérationnel de l'application console
-        menu.lancerApplication(); // [cite: 136]
+        menu.lancerApplication();
     }
 }
