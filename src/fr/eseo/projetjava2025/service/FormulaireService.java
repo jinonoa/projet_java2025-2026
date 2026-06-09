@@ -54,13 +54,14 @@ public class FormulaireService {
      * @param id L'identifiant du formulaire recherché.
      * @return Le formulaire correspondant ou null s'il n'existe pas.
      */
+    /**
     public Formulaire getFormulaire(int id) {
         return formulaires.stream()
                 .filter(f -> f.getIdentifiant() == id)
                 .findFirst()
                 .orElse(null);
     }
-
+     */
     /**
      * @brief Retourne la liste complète des formulaires enregistrés.
      * @return List<Formulaire> contenant tous les formulaires.
