@@ -9,7 +9,7 @@ import java.util.Scanner;
  * @file SaisieUtilisateur.java
  * @brief Classe responsable de la capture sécurisée des données saisies par l'utilisateur.
  */
-public class SaisieUtilisateur { // [cite: 144]
+public class SaisieUtilisateur {
 
     /** @brief Scanner lié au flux d'entrée standard (clavier). */
     private Scanner scanner = new Scanner(System.in);
@@ -18,7 +18,7 @@ public class SaisieUtilisateur { // [cite: 144]
      * @brief Lit un entier valide depuis le terminal.
      * @return int L'entier saisi.
      */
-    public int lireInt() { // [cite: 149]
+    public int lireInt() {
         while (true) {
             try {
                 return Integer.parseInt(scanner.nextLine().trim());
@@ -40,7 +40,7 @@ public class SaisieUtilisateur { // [cite: 144]
      * @brief Lit une date au format textuel français et la convertit en objet temporel Java.
      * @return LocalDate La date correspondante.
      */
-    public LocalDate lireDate() { // [cite: 149]
+    public LocalDate lireDate() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         while (true) {
             String saisie = scanner.nextLine().trim();

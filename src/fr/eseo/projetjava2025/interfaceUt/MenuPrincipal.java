@@ -124,7 +124,7 @@ public class MenuPrincipal {
      * @brief Routeur interne appelant l'action métier associée à l'option saisie.
      * @param choix Option numérique saisie par l'utilisateur.
      */
-    private void gererChoix(int choix) {
+    void gererChoix(int choix) {
         switch (choix) {
             case 1 -> ajouterNouveauFormulaire();
             case 2 -> consulterFormulaires();
@@ -142,9 +142,9 @@ public class MenuPrincipal {
      * @note Utilise précisément les attributs : codeECUE, date, heure, duree, modalite pour l'Epreuve.
      */
     private void ajouterNouveauFormulaire() {
-        affichage.afficherMessage("\n--- SÉQUENCE D'ENREGISTREMENT D'UNE FRAUDE ---");
+        affichage.afficherMessage("\n SÉQUENCE D'ENREGISTREMENT D'UNE FRAUDE ");
 
-        // Saisie des métadonnées de l'épreuve
+        // Saisie des données de l'épreuve
         System.out.print("Code ECUE de l'épreuve (Ex: M4102) : ");
         String codeECUE = saisie.lireString();
         System.out.print("Date de l'épreuve (JJ/MM/AAAA) : ");
@@ -166,7 +166,7 @@ public class MenuPrincipal {
         // Boucle d'enregistrement des étudiants impliqués (Diagramme de Séquence, boucle 1)
         String optionEtudiant;
         do {
-            affichage.afficherMessage("\n-> Enregistrement d'un étudiant impliqué :");
+            affichage.afficherMessage("\n Enregistrement d'un étudiant impliqué :");
             System.out.print("Nom : ");
             String nom = saisie.lireString();
             System.out.print("Prénom : ");
@@ -237,7 +237,7 @@ public class MenuPrincipal {
             choix = saisie.lireInt();
         }
 
-        // On retourne le cursus correspondant (index - 1 car les tableaux commencent à 0)
+        // On retourne le cursus correspondant
         return lesCursus[choix - 1];
     }
 
@@ -283,8 +283,8 @@ public class MenuPrincipal {
     }
 
     private void afficherStatistiques() {
-        affichage.afficherMessage("\n--- ÉDITION DES METRIQUES ET STATISTIQUES ---");
-        // Les appels s'enchaînent de manière synchrone, à l'image du diagramme de séquence (Page 7)
+        affichage.afficherMessage("\nEDITION DES METRIQUES ET STATISTIQUES");
+        // Les appels s'enchaînent
         affichage.afficherMessage("Nombre total de formulaires instanciés : " + statistiquesService.nombreTotalFormulaires());
         affichage.afficherMessage("Nombre global d'étudiants fraudeurs uniques : " + statistiquesService.nombreEtudiantsDistincts());
         affichage.afficherMessage("Nombre cumulé d'infractions (fraudes) : " + statistiquesService.nombreTotalFraudes());
@@ -293,7 +293,7 @@ public class MenuPrincipal {
     }
 
     private void afficherGraphePlagiat() {
-        // Exécution de la cinématique décrite en Page 8 : calcul, puis récupération textuelle
+        // Afficahege graphe de plagiat
         grapheEtudiants.construireGraphe(formulaireService.getTousLesFormulaires());
         affichage.afficherMessage("\n" + grapheEtudiants.afficherGraphe());
     }

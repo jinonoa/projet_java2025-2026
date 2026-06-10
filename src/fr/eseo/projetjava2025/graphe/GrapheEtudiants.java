@@ -66,7 +66,7 @@ public class GrapheEtudiants {
      * @return String affichant les relations entre étudiants.
      */
     public String afficherGraphe() {
-        StringBuilder sb = new StringBuilder("=== Graphe des étudiants fraudeurs ===\n");
+        StringBuilder sb = new StringBuilder(" Graphe des étudiants fraudeurs \n");
         for (Map.Entry<Etudiant, Set<Etudiant>> entry : graphe.entrySet()) {
             sb.append(entry.getKey().getNom())
                     .append(" <-> ")
